@@ -426,13 +426,15 @@ a.btn-signup:hover, a.btn-signin:hover {
   border-radius: 70px;
   left: 155px;
   top: -1000px;
-  background: url(https://cloudfront-us-east-1.images.arcpublishing.com/infobae/RIU33PT5AVA3NFSZCZ6PYVKS5M.jpg);
+  background: url(https://cdn-icons-png.freepik.com/512/4140/4140077.png);
   background-size: 100% 135%;
   background-position: 100% 100%;
   opacity: 0;
   transition: top 1.5s ease 0.35s, opacity .75s ease .5s;
   border: solid 3px #ffffff;
+  object-fit: fill;
 }
+
 
 .profile-photo-down {
   top: -636px;

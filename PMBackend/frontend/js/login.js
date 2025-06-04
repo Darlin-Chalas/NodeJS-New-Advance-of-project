@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Usuario ingresado:', window.usuarioIngresado);
         console.log('Contraseña ingresada:', window.contraseñaIngresada);
         usuarios.forEach(usuario => {
-            if (usuarioIngresado == usuario.usuario && contraseñaIngresada == usuario.contraseña) {
+            if (usuarioIngresado == usuario.nombre && contraseñaIngresada == usuario.contraseña) {
                 console.log('Usuario y contraseña válidos.');
                 flag = true;
             }
@@ -76,7 +76,7 @@ fetch('http://localhost:3000/usuarios')
     }
     //const lista = document.getElementById('lista-usuarios');
     usuarios.forEach(usuario => {
-      console.log(`Contr: ${usuario.contraseña}, Nomb: ${usuario.usuario}`);
+      console.log(`Contr: ${usuario.contraseña}, Nomb: ${usuario.nombre}`);
       //const li = document.createElement('li');
       //li.textContent = `Contr: ${usuario.contraseña}, Nomb: ${usuario.usuario}`;
       //lista.appendChild(li);
@@ -85,4 +85,5 @@ fetch('http://localhost:3000/usuarios')
   .catch(error => {
     console.error('Error al obtener usuarios:', error);
   });
+
 
