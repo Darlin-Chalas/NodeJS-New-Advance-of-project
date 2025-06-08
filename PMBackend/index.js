@@ -1,18 +1,15 @@
 // 1. Importar express
 const express = require('express');
-const { sql, poolPromise } = require('./Config/DB'); // Usa tu módulo de conexión
 const cors = require('cors');
+const { sql, poolPromise } = require('./Config/DB'); // Usa tu módulo de conexión
+require('dotenv').config();
+
 const app = express();
 app.use(cors()); // 🔓 Habilita CORS para cualquier origen
-
-
 
 // 2. Middleware para leer JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// 2.5. .env extension
-require('dotenv').config();
 
 // 3. Ruta de prueba
 //app.get('/usuarios', (req, res) => {
@@ -95,3 +92,31 @@ app.get('/solicitud_servicio', (req, res) => {
     solicitudes
   })};
 });
+
+// Rutas para la gestión de usuarios
+const router = express.Router();
+
+// Ruta para registrar usuario
+router.post('/register', async (req, res) => {
+  try {
+    console.log('Datos recibidos en el backend:', req.body);
+    const { nombre, correo, contraseña, id_cliente } = req.body;
+    if (!nombre || !correo || !contraseña || !id_cliente) {
+      return res.status(400).json({ error: 'Faltan datos obligatorios.' });
+    }
+    const pool = await poolPromise;
+    await pool.request()
+      .input('nombre', sql.VarChar(20), nombre)
+      .input('correo', sql.VarChar(100), correo)
+      .input('contraseña', sql.VarChar(100), contraseña)
+      .input('id_cliente', sql.Int, parseInt(id_cliente))
+      .query('INSERT INTO Usuarios (nombre, correo, contraseña, id_cliente) VALUES (@nombre, @correo, @contraseña, @id_cliente)');
+    res.json({ message: 'Usuario registrado correctamente.' });
+  } catch (err) {
+    console.error('Error al registrar usuario:', err);
+    res.status(500).json({ error: 'Error al registrar usuario.' });
+  }
+});
+
+app.use('/api', router);
+

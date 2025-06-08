@@ -44,7 +44,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const btnGoBack = document.querySelector('.btn-goback');
             const forgot = document.querySelector('.forgot');
             if (btnAnimate) btnAnimate.classList.toggle('btn-animate-grow');
-            if (welcome) welcome.classList.toggle('welcome-left');
+            if (welcome) {
+              welcome.textContent = `Welcome ${window.usuarioIngresado}`;
+              welcome.classList.toggle('welcome-left');
+            }
             if (coverPhoto) coverPhoto.classList.toggle('cover-photo-down');
             if (frame) frame.classList.toggle('frame-short');
             if (profilePhoto) profilePhoto.classList.toggle('profile-photo-down');
@@ -55,6 +58,54 @@ document.addEventListener('DOMContentLoaded', function() {
       else {
         console.error('Los campos de usuario o contraseña no han sido ingresados.');
         alert('Por favor, ingresa un usuario y una contraseña válidos.');
+      }
+    });
+  }
+
+  // REGISTRO DE USUARIO
+  const btnSignUp = document.querySelector('.btn-signup');
+  if (btnSignUp) {
+    btnSignUp.addEventListener('click', async function(e) {
+      console.log('Click en Sign Up');
+      e.preventDefault();
+      // Selecciona SOLO los campos del formulario de registro
+      const form = document.querySelector('.form-signup');
+      const fullname = form.querySelector('input[name="fullname"]').value;
+      const email = form.querySelector('input[name="email"]').value;
+      const password = form.querySelector('input[name="rpassword"]').value;
+      const id_cliente = form.querySelector('input[name="id_cliente"]').value;
+
+      // Validación básica
+      if (!fullname || !email || !password || !id_cliente) {
+        alert('Por favor, completa todos los campos para registrarte.');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nombre: fullname,
+            correo: email,
+            contraseña: password,
+            id_cliente: id_cliente
+          })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          alert('¡Usuario registrado correctamente!');
+          form.reset();
+          // Opcional: muestra la animación de éxito
+          const successDiv = document.querySelector('.success');
+          if (successDiv) successDiv.style.display = 'block';
+        } else {
+          alert(data.error || 'Error al registrar usuario.');
+        }
+      } catch (error) {
+        alert('Error de conexión con el servidor.');
+        console.error(error);
       }
     });
   }
@@ -85,5 +136,3 @@ fetch('http://localhost:3000/usuarios')
   .catch(error => {
     console.error('Error al obtener usuarios:', error);
   });
-
-
