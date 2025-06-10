@@ -37,7 +37,23 @@ app.get('/usuarios', async (req, res) => {
   }
 });
 
-app.get('/politicas_privacidad', (req, res) => {
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////La ruta del diablo no funciona coño
+//La ruta de lo cliente coñaso no funciona diablo coñaaaso
+
+app.get('/clientes', async(req, res) => {
+  try {
+    const pool = await poolPromise; // Usa la conexión centralizada
+    const result = await pool.request().query('SELECT id_cliente, correo FROM Clientes');
+    //console.log('Datos de clientes:', result.recordset); // Para depuración
+    res.json(result.recordset);
+  } catch (err) {
+    console.error('Error al conectar con Azure SQL:', err);
+    res.status(500).send('Error al obtener clientes');
+  }
+});app.get('/politicas_privacidad', (req, res) => {
+
+
   res.json({
     page: 'politicas_privacidad',
     title: 'Políticas de Privacidad',
@@ -88,29 +104,39 @@ app.get('/solicitud_servicio', (req, res) => {
       });
   } else {
     res.json({
-    title: 'Solicitudes Actuales:', 
-    solicitudes
+    solicitudes 
   })};
 });
 
 // Rutas para la gestión de usuarios
 const router = express.Router();
 
+// Ruta para obtener todos los clientes
+//router.get('/clientes', async (req, res) => {
+//  try {
+//    const pool = await poolPromise;
+//    const result = await pool.request().query('SELECT id_cliente, correo FROM Clientes');
+//    res.json(result.recordset);
+//  } catch (err) {
+//    console.error('Error al obtener clientes:', err);
+//    res.status(500).json({ error: 'Error al obtener clientes.' });
+//  }
+//});
+
 // Ruta para registrar usuario
-router.post('/register', async (req, res) => {
+router.post('/registrar_usuario', async (req, res) => {
   try {
     console.log('Datos recibidos en el backend:', req.body);
-    const { nombre, correo, contraseña, id_cliente } = req.body;
-    if (!nombre || !correo || !contraseña || !id_cliente) {
+    const { contraseña, id_cliente } = req.body;
+    if (!!contraseña || !id_cliente) {
       return res.status(400).json({ error: 'Faltan datos obligatorios.' });
     }
     const pool = await poolPromise;
     await pool.request()
-      .input('nombre', sql.VarChar(20), nombre)
       .input('correo', sql.VarChar(100), correo)
       .input('contraseña', sql.VarChar(100), contraseña)
       .input('id_cliente', sql.Int, parseInt(id_cliente))
-      .query('INSERT INTO Usuarios (nombre, correo, contraseña, id_cliente) VALUES (@nombre, @correo, @contraseña, @id_cliente)');
+      .query('INSERT INTO Usuarios (contraseña, id_cliente) VALUES ( @contraseña, @id_cliente)');
     res.json({ message: 'Usuario registrado correctamente.' });
   } catch (err) {
     console.error('Error al registrar usuario:', err);

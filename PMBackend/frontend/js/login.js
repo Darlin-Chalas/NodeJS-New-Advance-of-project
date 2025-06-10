@@ -1,8 +1,9 @@
 // Variables globales para almacenar los datos ingresados
-window.usuarioIngresado = '';
+window.emailIngresado = '';
 window.contraseñaIngresada = '';
 // Creamos una lista para almacenar los usuarios
 window.usuarios = [];
+window.clientes = [];
 
 // Espera a que el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
@@ -12,28 +13,28 @@ document.addEventListener('DOMContentLoaded', function() {
     btnSignIn.addEventListener('click', function(e) {
       e.preventDefault();
       // Obtiene los valores de los campos de usuario y contraseña
-      const usernameInput = document.querySelector('input[name="username"]');
+      const emailInput = document.querySelector('input[name="email"]');
       const passwordInput = document.querySelector('input[name="password"]');
-      if (usernameInput.value.length >= 1 && passwordInput.value.length >= 1) {
-        var flag = false;
+      if (emailInput.value.length >= 1 && passwordInput.value.length >= 1) {
+        var usuarioValido = false;
         // Asigna los valores a las variables globales
-        window.usuarioIngresado = usernameInput.value;
+        window.emailIngresado = emailInput.value;
         window.contraseñaIngresada = passwordInput.value;
-        console.log('Usuario ingresado:', window.usuarioIngresado);
+        console.log('Usuario ingresado:', window.emailIngresado);
         console.log('Contraseña ingresada:', window.contraseñaIngresada);
         usuarios.forEach(usuario => {
-            if (usuarioIngresado == usuario.nombre && contraseñaIngresada == usuario.contraseña) {
-                console.log('Usuario y contraseña válidos.');
-                flag = true;
+            if (emailIngresado == usuario.correo && contraseñaIngresada == usuario.contraseña) {
+                console.log('Correo y contraseña válidos.');
+                usuarioValido = true;
             }
         });
         // Verifica si el usuario y la contraseña son válidos
-        if (!flag) {
-          console.error('Usuario o contraseña incorrectos.');
-          alert('Usuario o contraseña incorrectos. Por favor, inténtalo de nuevo.');
+        if (!usuarioValido) {
+          console.error('Correo o contraseña incorrectos.');
+          alert('Correo o contraseña incorrectos. Por favor, inténtalo de nuevo.');
         }
         else {
-            console.log('Usuario y contraseña válidos.');
+            console.log('Correo y contraseña válidos.');
             //alert('Inicio de sesión exitoso.');
             // Cambia las clases usando JavaScript puro
             const btnAnimate = document.querySelector('.btn-animate');
@@ -45,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const forgot = document.querySelector('.forgot');
             if (btnAnimate) btnAnimate.classList.toggle('btn-animate-grow');
             if (welcome) {
-              welcome.textContent = `Welcome ${window.usuarioIngresado}`;
+              welcome.textContent = `Welcome ${window.emailIngresado}`;
               welcome.classList.toggle('welcome-left');
             }
             if (coverPhoto) coverPhoto.classList.toggle('cover-photo-down');
@@ -56,8 +57,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
       else {
-        console.error('Los campos de usuario o contraseña no han sido ingresados.');
-        alert('Por favor, ingresa un usuario y una contraseña válidos.');
+        console.error('Los campos de correo o contraseña no han sido ingresados.');
+        alert('Por favor, ingresa un correo y una contraseña válidos.');
       }
     });
   }
@@ -70,46 +71,59 @@ document.addEventListener('DOMContentLoaded', function() {
       e.preventDefault();
       // Selecciona SOLO los campos del formulario de registro
       const form = document.querySelector('.form-signup');
-      const fullname = form.querySelector('input[name="fullname"]').value;
-      const email = form.querySelector('input[name="email"]').value;
+      const email = form.querySelector('input[name="remail"]').value;
       const password = form.querySelector('input[name="rpassword"]').value;
       const id_cliente = form.querySelector('input[name="id_cliente"]').value;
 
       // Validación básica
-      if (!fullname || !email || !password || !id_cliente) {
+      if (!email || !password || !id_cliente) {
         alert('Por favor, completa todos los campos para registrarte.');
         return;
       }
 
-      try {
-        const response = await fetch('http://localhost:3000/api/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            nombre: fullname,
-            correo: email,
-            contraseña: password,
-            id_cliente: id_cliente
-          })
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          alert('¡Usuario registrado correctamente!');
-          form.reset();
-          // Opcional: muestra la animación de éxito
-          const successDiv = document.querySelector('.success');
-          if (successDiv) successDiv.style.display = 'block';
-        } else {
-          alert(data.error || 'Error al registrar usuario.');
+      // Lógica de negocio: verificar si el correo corresponde al id_cliente
+      let clienteValido = false;
+      clientes.forEach(cliente => {
+        if (cliente.id_cliente == id_cliente && cliente.correo == email) {
+          clienteValido = true;
         }
-      } catch (error) {
-        alert('Error de conexión con el servidor.');
-        console.error(error);
+      });
+
+      if (!clienteValido) {
+        alert('El correo no corresponde al cliente con ese ID.');
+        return;
+      }
+      //Si pasa la validación, continúa con el registro
+      else {
+        try {
+          const response = await fetch('http://localhost:3000/registrar_usuario', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contraseña: password,
+              id_cliente: id_cliente
+            })
+          });
+
+          const data = await response.json();
+          if (response.ok) {
+            alert('¡Usuario registrado correctamente!');
+            form.reset();
+            // Opcional: muestra la animación de éxito
+            const successDiv = document.querySelector('.success');
+            if (successDiv) successDiv.style.display = 'block';
+          } else {
+            alert(data.error || 'Error al registrar usuario.');
+          }
+        } catch (error) {
+          alert('Error de conexión con el servidor.');
+          console.error(error);
+        }
       }
     });
   }
 });
+//----------------------------------------------------------------------------------------
 
 
 // Hacemos una petición GET al backend
@@ -135,4 +149,29 @@ fetch('http://localhost:3000/usuarios')
   })
   .catch(error => {
     console.error('Error al obtener usuarios:', error);
+  });
+
+//----------------------------------------------------------------------------------------
+
+//Aqui obtenemos el id y correo para
+//verificar dentro del formulario de
+//registro si concuerdan el id y el correo
+fetch('http://localhost:3000/clientes')
+  .then(response => response.json())
+    .then(data => {
+      // Guardamos los clientes en la lista
+      clientes.push(...data);
+      if (clientes.length === 0) {
+        console.log('No hay clientes disponibles.');
+        return;
+      }
+      else {
+        console.log('Clientes obtenidos:', clientes);
+      }
+      clientes.forEach(cliente => {
+        console.log(`ID: ${cliente.id_cliente}, Correo: ${cliente.correo}`);
+    });    
+  })
+  .catch(error => {
+    console.error('Error al obtener clientes:', error);
   });
