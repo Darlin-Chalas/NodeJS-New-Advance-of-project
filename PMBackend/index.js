@@ -29,7 +29,7 @@ app.listen(PORT, () => {
 app.get('/usuarios', async (req, res) => {
   try {
     const pool = await poolPromise; // Usa la conexión centralizada
-    const result = await pool.request().query('SELECT contraseña, nombre FROM Usuarios');
+    const result = await pool.request().query('SELECT correo, contraseña FROM Usuarios');
     res.json(result.recordset);
   } catch (err) {
     console.error('Error al conectar con Azure SQL:', err);
@@ -51,9 +51,10 @@ app.get('/clientes', async(req, res) => {
     console.error('Error al conectar con Azure SQL:', err);
     res.status(500).send('Error al obtener clientes');
   }
-});app.get('/politicas_privacidad', (req, res) => {
+});
 
 
+app.get('/politicas_privacidad', (req, res) => {
   res.json({
     page: 'politicas_privacidad',
     title: 'Políticas de Privacidad',

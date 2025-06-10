@@ -141,7 +141,7 @@ fetch('http://localhost:3000/usuarios')
     }
     //const lista = document.getElementById('lista-usuarios');
     usuarios.forEach(usuario => {
-      console.log(`Contr: ${usuario.contraseña}, Nomb: ${usuario.nombre}`);
+      console.log(`Contr: ${usuario.contraseña}, Corr: ${usuario.correo}`);
       //const li = document.createElement('li');
       //li.textContent = `Contr: ${usuario.contraseña}, Nomb: ${usuario.usuario}`;
       //lista.appendChild(li);
