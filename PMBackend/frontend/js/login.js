@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
       //Si pasa la validación, continúa con el registro
       else {
         try {
-          const response = await fetch('http://localhost:3000/registrar_usuario', {
+          const response = await fetch('http://localhost:3000/api/registrar_usuario', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -108,8 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const data = await response.json();
           if (response.ok) {
             alert('¡Usuario registrado correctamente!');
-            form.reset();
-            // Opcional: muestra la animación de éxito
+            form.reset();            // Opcional: muestra la animación de éxito
             const successDiv = document.querySelector('.success');
             if (successDiv) successDiv.style.display = 'block';
           } else {

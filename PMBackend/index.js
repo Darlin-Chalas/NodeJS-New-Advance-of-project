@@ -129,12 +129,11 @@ router.post('/registrar_usuario', async (req, res) => {
   try {
     console.log('Datos recibidos en el backend:', req.body);
     const { contraseña, id_cliente } = req.body;
-    if (!!contraseña || !id_cliente) {
+    if (!contraseña || !id_cliente) {
       return res.status(400).json({ error: 'Faltan datos obligatorios.' });
     }
     const pool = await poolPromise;
     await pool.request()
-      .input('correo', sql.VarChar(100), correo)
       .input('contraseña', sql.VarChar(100), contraseña)
       .input('id_cliente', sql.Int, parseInt(id_cliente))
       .query('INSERT INTO Usuarios (contraseña, id_cliente) VALUES ( @contraseña, @id_cliente)');
