@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const { sql, poolPromise } = require('./Config/DB'); // Usa tu módulo de conexión
+const { VarChar } = require('mssql');
 require('dotenv').config();
 
 const app = express();
@@ -50,6 +51,25 @@ app.get('/clientes', async(req, res) => {
   } catch (err) {
     console.error('Error al conectar con Azure SQL:', err);
     res.status(500).send('Error al obtener clientes');
+  }
+});
+
+app.get('/cliente_nombre', async (req, res) => {
+  try {
+    const { correo } = req.query; // Obtiene el ID del cliente desde la query string
+    const pool = await poolPromise; // Usa la conexión centralizada
+    const result = await pool.request()
+      .input('correo', sql.VarChar(100), correo)
+      .query('SELECT nombre FROM Clientes WHERE correo = @correo');
+    
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ error: 'Cliente no encontrado.' });
+    }
+    
+    res.json(result.recordset[0]);
+  } catch (err) {
+    console.error('Error al obtener cliente por correo:', err);
+    res.status(500).send('Error al obtener cliente por correo');
   }
 });
 

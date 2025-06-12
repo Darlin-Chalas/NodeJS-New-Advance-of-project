@@ -4,11 +4,14 @@ window.contraseñaIngresada = '';
 // Creamos una lista para almacenar los usuarios
 window.usuarios = [];
 window.clientes = [];
+window.clienteNombre = '';
 
 // Espera a que el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
   // Selecciona el botón de Sign in
   const btnSignIn = document.querySelector('.btn-signin');
+  const btnGoIndex = document.querySelector('.btn-goindex');
+  // Si el botón de ir al index existe, agrega el evento click 
   if (btnSignIn) {
     btnSignIn.addEventListener('click', function(e) {
       e.preventDefault();
@@ -34,26 +37,35 @@ document.addEventListener('DOMContentLoaded', function() {
           alert('Correo o contraseña incorrectos. Por favor, inténtalo de nuevo.');
         }
         else {
-            console.log('Correo y contraseña válidos.');
-            //alert('Inicio de sesión exitoso.');
-            // Cambia las clases usando JavaScript puro
-            const btnAnimate = document.querySelector('.btn-animate');
-            const welcome = document.querySelector('.welcome');
-            const coverPhoto = document.querySelector('.cover-photo');
-            const frame = document.querySelector('.frame');
-            const profilePhoto = document.querySelector('.profile-photo');
-            const btnGoBack = document.querySelector('.btn-goback');
-            const forgot = document.querySelector('.forgot');
-            if (btnAnimate) btnAnimate.classList.toggle('btn-animate-grow');
-            if (welcome) {
-              welcome.textContent = `Welcome ${window.emailIngresado}`;
+          console.log('Correo y contraseña válidos.');
+          //alert('Inicio de sesión exitoso.');
+          // Cambia las clases usando JavaScript puro
+          const btnAnimate = document.querySelector('.btn-animate');
+          const welcome = document.querySelector('.welcome');
+          const coverPhoto = document.querySelector('.cover-photo');
+          const frame = document.querySelector('.frame');
+          const profilePhoto = document.querySelector('.profile-photo');
+          const btnGoBack = document.querySelector('.btn-goback');
+          const forgot = document.querySelector('.forgot');
+          if (btnAnimate) btnAnimate.classList.toggle('btn-animate-grow');
+          if (welcome) {
+            fetch('http://localhost:3000/cliente_nombre?correo=' + emailIngresado)
+            .then(response => response.json())
+            .then(data => {
+              clienteNombre = data.nombre;
+              console.log('Nombre del cliente:', clienteNombre);
+              welcome.textContent = `Welcome ${clienteNombre}`;
               welcome.classList.toggle('welcome-left');
-            }
-            if (coverPhoto) coverPhoto.classList.toggle('cover-photo-down');
-            if (frame) frame.classList.toggle('frame-short');
-            if (profilePhoto) profilePhoto.classList.toggle('profile-photo-down');
-            if (btnGoBack) btnGoBack.classList.toggle('btn-goback-up');
-            if (forgot) forgot.classList.toggle('forgot-fade');
+              if (coverPhoto) coverPhoto.classList.toggle('cover-photo-down');
+              if (frame) frame.classList.toggle('frame-short');
+              if (profilePhoto) profilePhoto.classList.toggle('profile-photo-down');
+              if (btnGoBack) btnGoBack.classList.toggle('btn-goback-up');
+              if (forgot) forgot.classList.toggle('forgot-fade');
+            })
+            .catch(error => {
+              console.error('Error al obtener el nombre del cliente:', error);
+            });
+          }
             // Busca el cliente correspondiente por correo
             const cliente = clientes.find(c => c.correo === window.emailIngresado);
             if (cliente) {
@@ -75,6 +87,10 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
+  //if (btnGoIndex) {
+  //  btnGoIndex.
+  //}
 
   // REGISTRO DE USUARIO
   const btnSignUp = document.querySelector('.btn-signup');
