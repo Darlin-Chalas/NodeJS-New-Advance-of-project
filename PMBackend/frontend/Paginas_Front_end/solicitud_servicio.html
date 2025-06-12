@@ -43,7 +43,7 @@
             <label class="form-label" style="width: 7.4%;">Placas:</label>
             <input type="text" name="Placas" style="width: 41.4%;overflow-x: hidden;border-top-style: none;border-right-style: none;border-bottom-width: 1px;border-left-style: none;">
             <label class="form-label" style="width: 19.5%;">Numero de serie:</label>
-            <input type="text" name="Nomero de Serie" style="width: 79.7%;overflow-x: hidden;border-top-style: none;border-right-style: none;border-bottom-width: 1px;border-left-style: none;">
+            <input type="text" name="Numero de Serie" style="width: 79.7%;overflow-x: hidden;border-top-style: none;border-right-style: none;border-bottom-width: 1px;border-left-style: none;">
             <div style="width:100%;display:flex;border-width:2px;">
               <div style="width:46%;">
                 <label class="form-label">Ingreso en grua:</label>
@@ -75,7 +75,7 @@
             <label class="form-label" style="width: 11%;">Teléfono:</label>
             <input type="text" name="telefono" style="width: 88.2%;overflow-x: hidden;border-top-style: none;border-right-style: none;border-bottom-width: 1px;border-left-style: none;">
             <label class="form-label" style="width: 8%;">Email:</label>
-            <input type="text" name="email" style="width: 91.2%;overflow: hidden;overflow-x: hidden;border-top-style: none;border-right-style: none;border-bottom-width: 1px;border-left-style: none;">
+            <input type="text" name="email" style="width: 91.2%;overflow-x: hidden;border-top-style: none;border-right-style: none;border-bottom-width: 1px;border-left-style: none;">
           </div>
         </div>
       </div>
@@ -261,7 +261,7 @@ document.querySelector('form').addEventListener('submit', async function(e) {
 
   // Lista de campos obligatorios (excepto inventario)
   const requiredFields = [
-    'Marca', 'Modelo', 'Color', 'Kilometraje', 'Placas', 'Nomero de Serie',
+    'Marca', 'Modelo', 'Color', 'Kilometraje', 'Placas', 'Numero de Serie',
     'ingreso', 'salida', 'nombre', 'telefono', 'email', 'trabajo_realizar', 'observaciones', 'ingreso_grua'
   ];
 
@@ -274,6 +274,12 @@ document.querySelector('form').addEventListener('submit', async function(e) {
   }
 
   const data = Object.fromEntries(formData.entries());
+
+  // Agrega el id_cliente desde localStorage antes de enviar
+  const id_cliente = localStorage.getItem('id_cliente');
+  if (id_cliente) {
+    data.id_cliente = id_cliente;
+  }
 
   // Envía los datos al backend usando fetch
   const response = await fetch(form.action, {
@@ -288,5 +294,31 @@ document.querySelector('form').addEventListener('submit', async function(e) {
     }
 });
   </script>
+  <script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Proteger acceso
+  if (!localStorage.getItem('id_cliente')) {
+    window.location.href = "/PMBackend/frontend/login.html";
+    return;
+  }
+  // Autocompletar nombre y correo
+  const nombre = localStorage.getItem('nombre_cliente');
+  const correo = localStorage.getItem('correo_cliente');
+  if (nombre) {
+    const nombreInput = document.querySelector('input[name="nombre"]');
+    if (nombreInput) {
+      nombreInput.value = nombre;
+      nombreInput.readOnly = true;
+    }
+  }
+  if (correo) {
+    const emailInput = document.querySelector('input[name="email"]');
+    if (emailInput) {
+      emailInput.value = correo;
+      emailInput.readOnly = true;
+    }
+  }
+});
+</script>
   </body>
   </html>

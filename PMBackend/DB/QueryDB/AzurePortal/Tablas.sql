@@ -10,6 +10,8 @@ create table Clientes(
     correo varchar(100)
 )
 
+SELECT * from Clientes;
+
 create table Usuarios(
     id_usuario int IDENTITY(1,1),
     id_cliente int not null,
@@ -20,7 +22,10 @@ create table Usuarios(
 SELECT * from Usuarios;
 
 ALTER TABLE Usuarios
-add nombre varchar(20) not null;
+add correo varchar(100);
+
+Alter table Usuarios
+drop column correo;
 
 
 create table Empleados(
@@ -74,6 +79,34 @@ create table OrdenesDeServicio(
     fecha_ingreso datetime,
     fecha_salida datetime
 )
+
+ALTER Table OrdenesDeServicio
+ADD
+Marca varchar(100),
+Modelo varchar(100),
+Color varchar(20),
+Kilometraje varchar(50),
+Placas varchar(50),
+[Numero de Serie] varchar(100),
+Ingreso_grua varchar(10),
+--Lo que estoy pensando es que el nombre y el Email
+--lo tome del mismo cliente que tiene la sesion iniciada
+Telefono varchar(15),
+Trabajo_realizar varchar(MAX),
+Observaciones varchar(MAX),
+Inventario_gato varchar(10),
+Inventario_herramientas varchar(10),
+Inventario_triangulos varchar(10),
+Inventario_tapetes varchar(10),
+inventario_llanta_refaccion varchar(10),
+Inventario_extintor varchar(10),
+Inventario_antena varchar(10),
+Inventario_emblemas varchar(10),
+Inventario_tapetes_rueda varchar(10),
+Inventario_cables varchar(10),
+Inventario_estereo varchar(10),
+Inventario_encendedor varchar(10)
+go
 
 --Linea divisora------------------------------
 
@@ -169,3 +202,9 @@ create table Facturas(
     --tambien va el costo total cosporhora x htrabajadas
 )
 
+CREATE TABLE Contacto (
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    nombre NVARCHAR(100),
+    correo NVARCHAR(100),
+    mensaje NVARCHAR(MAX)
+);

@@ -54,6 +54,19 @@ document.addEventListener('DOMContentLoaded', function() {
             if (profilePhoto) profilePhoto.classList.toggle('profile-photo-down');
             if (btnGoBack) btnGoBack.classList.toggle('btn-goback-up');
             if (forgot) forgot.classList.toggle('forgot-fade');
+            // Busca el cliente correspondiente por correo
+            const cliente = clientes.find(c => c.correo === window.emailIngresado);
+            if (cliente) {
+              localStorage.setItem('id_cliente', cliente.id_cliente);
+              localStorage.setItem('nombre_cliente', cliente.nombre || '');
+              localStorage.setItem('correo_cliente', cliente.correo);
+              if (welcome) {
+                welcome.textContent = `Welcome ${cliente.nombre || cliente.correo}`;
+                welcome.classList.toggle('welcome-left');
+              }
+            }
+            // Redirige al index solo si login es exitoso
+            window.location.href = "/PMBackend/frontend/Paginas_Front_end/index.html";
         }
       }
       else {
