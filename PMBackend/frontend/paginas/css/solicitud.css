@@ -1,0 +1,14 @@
+.hover:hover {
+    transform: scale(1.2);
+    transition: transform 0.3s ease;
+}
+
+.hover:active {
+    transition: transform 0.1s ease;
+    transform: scale(1.1);
+}
+
+.hover:not(:hover) {
+    transition: transform 0.3s ease;
+    transform: scale(1);
+}
