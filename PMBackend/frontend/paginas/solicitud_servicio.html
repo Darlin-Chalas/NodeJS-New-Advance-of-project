@@ -41,10 +41,10 @@
             <input type="text" name="Color" style="width: 41.8%;overflow-x: hidden;border-top-style: none;border-right-style: none;border-bottom-width: 1px;border-left-style: none;">
             <label class="form-label" style="width: 14%;">Kilometraje:</label>
             <input type="text" name="Kilometraje" style="width: 35%;overflow-x: hidden;border-top-style: none;border-right-style: none;border-bottom-width: 1px;border-left-style: none;">
-            <label class="form-label" style="width: 7.4%;">Placas:</label>
+            <label class="form-label" style="width: 7.4%;">Placa:</label>
             <input type="text" name="Placas" style="width: 41.4%;overflow-x: hidden;border-top-style: none;border-right-style: none;border-bottom-width: 1px;border-left-style: none;">
             <label class="form-label" style="width: 19.5%;">Numero de serie:</label>
-            <input type="text" name="Numero de Serie" style="width: 79.7%;overflow-x: hidden;border-top-style: none;border-right-style: none;border-bottom-width: 1px;border-left-style: none;">
+            <input type="text" name="NumeroDeSerie" style="width: 79.7%;overflow-x: hidden;border-top-style: none;border-right-style: none;border-bottom-width: 1px;border-left-style: none;">
             <div style="width:100%;display:flex;border-width:2px;">
               <div style="width:46%;">
                 <label class="form-label">Ingreso en grua:</label>
@@ -86,7 +86,6 @@
     <h1 class="fw-bolder" style="font-size:21.88px;letter-spacing:-0.9px;background:rgb(217,217,217);">TRABAJO A REALIZAR</h1>
     <textarea name="trabajo_realizar" style="position:relative;display:inline-grid;height:100%;width:100%;background:rgb(248,248,248);border-style:none;"></textarea>
     <h1 class="fw-bolder" style="font-size:21.88px;letter-spacing:-0.9px;background:rgb(217,217,217);">OBSERVACIONES</h1>
-    <textarea name="observaciones" style="position:relative;display:inline-grid;height:100%;width:100%;background:rgb(248,248,248);border-style:none;"></textarea>
   </div>
   <div class="text-center py-4">
     <ul class="list-inline text-center" style="display:block;">
@@ -252,86 +251,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/PMBackend/frontend/paginas/assets/js/script.min.js?h=bfb49eee47f0544059cc5a9c6945ad45"></script>
-  <script>
-// Maneja el envío del formulario usando JavaScript
-document.querySelector('form').addEventListener('submit', async function(e) {
-  e.preventDefault(); // Evita el envío tradicional
-
-  const form = e.target;
-  const formData = new FormData(form);
-
-  // Lista de campos obligatorios (excepto inventario)
-  const requiredFields = [
-    'Marca', 'Modelo', 'Color', 'Kilometraje', 'Placas', 'Numero de Serie',
-    'ingreso', 'salida', 'nombre', 'telefono', 'email', 'trabajo_realizar', 'observaciones', 'ingreso_grua'
-  ];
-
-  // Verifica si algún campo obligatorio está vacío
-  for (const field of requiredFields) {
-    if (!formData.get(field) || formData.get(field).trim() === '') {
-      alert('Por favor, complete todos los campos obligatorios antes de enviar la solicitud.');
-      return;
-    }
-  }
-
-  const data = Object.fromEntries(formData.entries());
-
-  // Agrega el id_cliente desde localStorage antes de enviar
-  const id_cliente = localStorage.getItem('id_cliente');
-  if (id_cliente) {
-    data.id_cliente = id_cliente;
-  }
-
-  // Envía los datos al backend usando fetch
-  const response = await fetch(form.action, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-
-    if (response.ok) {
-      alert('¡Solicitud enviada correctamente!, le estaremos contactando pronto!.');
-      form.reset();
-    }
-});
-  </script>
-  <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Proteger acceso
-  if (!localStorage.getItem('id_cliente')) {
-    window.location.href = "/PMBackend/frontend/login.html";
-    return;
-  }
-  // Autocompletar nombre y correo
-  const nombre = localStorage.getItem('nombre_cliente');
-  const correo = localStorage.getItem('correo_cliente');
-  const telefono = localStorage.getItem('telefono_cliente');
-  if (nombre) {
-    const nombreInput = document.querySelector('input[name="nombre"]');
-    if (nombreInput) {
-      nombreInput.value = nombre;
-      nombreInput.readOnly = true;
-    }
-  }
-  if (correo) {
-    const emailInput = document.querySelector('input[name="email"]');
-    if (emailInput) {
-      emailInput.value = correo;
-      emailInput.readOnly = true;
-    }
-  }
-  if (telefono) {
-    const telefonoInput = document.querySelector('input[name="telefono"]');
-    if (telefonoInput) {
-      telefonoInput.value = telefono;
-      telefonoInput.readOnly = true;
-    }
-  }
-  else
-  {
-    console.log("No se encontró el número de teléfono en localStorage.");
-  }
-});
-</script>
+  <script src="/PMBackend/frontend/paginas/js/solicitud_servicio.js"></script>
   </body>
   </html>
