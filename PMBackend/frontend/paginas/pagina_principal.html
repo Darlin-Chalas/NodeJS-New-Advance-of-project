@@ -280,7 +280,7 @@
                   </div>
                 </div>
                 <div class="col-md-6 order-first order-md-last" style="min-height: 250px;">
-                  <img class="w-100 h-100 fit-cover" src="/PMBackend/frontend/paginas/assets/img/Pagina%20de%20solicitud%20de%20citas..jpg?h=8820f1a1873fdde95add72d245c17669" style="filter: blur(3px);" width="558" height="558">
+                  <img class="w-100 h-100 fit-cover" src="/PMBackend/frontend/paginas/assets/img/Pagina%20de%20solicitud%20de%20citas..jpg?h=8820f1a1873fdde95add72d245c17669" width="558" height="558">
                 </div>
               </div>
             </div>
@@ -360,8 +360,8 @@
   <script src="/PMBackend/frontend/paginas/assets/js/script.min.js?h=bfb49eee47f0544059cc5a9c6945ad45"></script>
   <script>
   // Si no hay id_cliente en localStorage, redirige al login
-  if (!localStorage.getItem('id_cliente')) {
-    window.location.href = "/PMBackend/frontend/login.html";
+  if (!localStorage.getItem('isLoggedIn')) {
+    window.location.href = "/PMBackend/frontend/paginas/js/script.js";
   }
 </script>
 </body>
