@@ -5,13 +5,9 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     // Si está autenticado, muestra el nombre del cliente
     const nombreCliente = localStorage.getItem('nombre_cliente');
-    const welcomeMessage = document.querySelector('.welcome-message');
+    const welcomeMessage = document.querySelector('.client-name');
     if (welcomeMessage) {
       welcomeMessage.textContent = `Bienvenido, ${nombreCliente}`;
-    }
-    const labelNombre = document.querySelector('.client-name');
-    if (labelNombre) {
-      labelNombre.textContent = `Bienvenido de nuevo ${nombreCliente}!`;
     }
   }
   const btnLogout = document.querySelector('.btn-logout');

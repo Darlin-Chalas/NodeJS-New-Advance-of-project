@@ -304,6 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Autocompletar nombre y correo
   const nombre = localStorage.getItem('nombre_cliente');
   const correo = localStorage.getItem('correo_cliente');
+  const telefono = localStorage.getItem('telefono_cliente');
   if (nombre) {
     const nombreInput = document.querySelector('input[name="nombre"]');
     if (nombreInput) {
@@ -317,6 +318,17 @@ document.addEventListener('DOMContentLoaded', function() {
       emailInput.value = correo;
       emailInput.readOnly = true;
     }
+  }
+  if (telefono) {
+    const telefonoInput = document.querySelector('input[name="telefono"]');
+    if (telefonoInput) {
+      telefonoInput.value = telefono;
+      telefonoInput.readOnly = true;
+    }
+  }
+  else
+  {
+    console.log("No se encontró el número de teléfono en localStorage.");
   }
 });
 </script>

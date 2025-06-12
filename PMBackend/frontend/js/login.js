@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
               localStorage.setItem('id_cliente', cliente.id_cliente);
               localStorage.setItem('nombre_cliente', cliente.nombre || '');
               localStorage.setItem('correo_cliente', cliente.correo);
+              localStorage.setItem('telefono_cliente', cliente.telefono || '');
               localStorage.setItem('isLoggedIn', 'true'); // Marca al usuario como logueado
               if (welcome) {
                 welcome.textContent = `Welcome ${cliente.nombre || cliente.correo}`;

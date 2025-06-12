@@ -45,7 +45,7 @@ app.get('/usuarios', async (req, res) => {
 app.get('/clientes', async(req, res) => {
   try {
     const pool = await poolPromise; // Usa la conexión centralizada
-    const result = await pool.request().query('SELECT id_cliente, correo, nombre FROM Clientes');
+    const result = await pool.request().query('SELECT id_cliente, correo, nombre, telefono FROM Clientes');
     //console.log('Datos de clientes:', result.recordset); // Para depuración
     res.json(result.recordset);
   } catch (err) {
