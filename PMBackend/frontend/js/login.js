@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
     btnGoIndex.addEventListener('click', function(e) {
       e.preventDefault();
       // Redirige al index
-      window.location.href = "/PMBackend/frontend/paginas/index.html";
+      window.location.href = "/PMBackend/frontend/paginas/pagina_principal.html";
     }
   )};
 
