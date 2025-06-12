@@ -72,13 +72,16 @@ document.addEventListener('DOMContentLoaded', function() {
               localStorage.setItem('id_cliente', cliente.id_cliente);
               localStorage.setItem('nombre_cliente', cliente.nombre || '');
               localStorage.setItem('correo_cliente', cliente.correo);
+              localStorage.setItem('isLoggedIn', 'true'); // Marca al usuario como logueado
               if (welcome) {
                 welcome.textContent = `Welcome ${cliente.nombre || cliente.correo}`;
                 welcome.classList.toggle('welcome-left');
               }
             }
             // Redirige al index solo si login es exitoso
-            window.location.href = "/PMBackend/frontend/Paginas_Front_end/index.html";
+            //setTimeout(() => {
+            //  window.location.href = "../Paginas_Front_end/index.html";
+            //});
         }
       }
       else {
@@ -88,9 +91,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  //if (btnGoIndex) {
-  //  btnGoIndex.
-  //}
+  if (btnGoIndex && localStorage.getItem('isLoggedIn') === 'true') {
+    btnGoIndex.addEventListener('click', function(e) {
+      e.preventDefault();
+      // Redirige al index
+      window.location.href = "/PMBackend/frontend/paginas/index.html";
+    }
+  )};
 
   // REGISTRO DE USUARIO
   const btnSignUp = document.querySelector('.btn-signup');
