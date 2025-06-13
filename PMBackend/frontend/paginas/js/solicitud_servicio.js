@@ -322,6 +322,7 @@ document.querySelector('form').addEventListener('submit', async function(e) {
     return;
   }
 
+
     // Luego envía las observaciones
     const responseObs = await fetch('http://localhost:3000/registrar_observaciones', {
       method: 'POST',
@@ -357,4 +358,6 @@ document.querySelector('form').addEventListener('submit', async function(e) {
     console.error('Error al enviar el inventario:', error);
     alert('Ocurrió un error al enviar el inventario. Por favor, inténtelo de nuevo.');
   }
+
+  
 });
