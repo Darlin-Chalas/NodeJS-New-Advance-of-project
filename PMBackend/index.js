@@ -146,6 +146,56 @@ app.post('/registrar_solicitud', async (req, res) => {
   }
 });
 
+// POST: Recibe y guarda las imagenes de observaciones
+app.post('/registrar_observaciones', async (req, res) => {
+  try {
+    const { id_cliente, observaciones } = req.body;
+
+    if (!id_cliente || !observaciones) {
+      return res.status(400).json({ error: 'Datos inválidos.' });
+    }
+
+    const pool = await poolPromise;
+    await pool.request()
+      .input('id_cliente', sql.Int, id_cliente)
+      .input('observaciones', sql.VarChar(sql.MAX), observaciones)
+      .query(`
+        INSERT INTO OrdenesDeServicio (id_cliente, observaciones)
+        VALUES (@id_cliente, @observaciones)
+      `);
+
+    res.json({ message: 'Observaciones guardadas correctamente.' });
+  } catch (err) {
+    console.error('Error al guardar las observaciones:', err);
+    res.status(500).send('Error al guardar las observaciones');
+  }
+});
+
+//POST: Recibe y guarda los checkboxes de inventario
+app.post('/registrar_inventario', async (req, res) => {
+  try {
+    const { id_cliente, inventario } = req.body;
+
+    if (!id_cliente || !inventario) {
+      return res.status(400).json({ error: 'Datos inválidos.' });
+    }
+
+    const pool = await poolPromise;
+    await pool.request()
+      .input('id_cliente', sql.Int, id_cliente)
+      .input('inventario', sql.VarChar(50), req.body.inventario)
+      .query(`
+        INSERT INTO OrdenesDeServicio (id_cliente, inventario)
+        VALUES (@id_cliente, @inventario)
+      `);
+
+    res.json({ message: 'Inventario guardado correctamente.' });
+  } catch (err) {
+    console.error('Error al guardar el inventario:', err);
+    res.status(500).send('Error al guardar el inventario');
+  }
+});
+
 // GET: Devuelve todas las solicitudes recibidas
 app.get('/solicitud_servicio', (req, res) => {
   

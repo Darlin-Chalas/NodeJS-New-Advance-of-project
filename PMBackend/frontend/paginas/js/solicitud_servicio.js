@@ -1,4 +1,5 @@
 window.arrayObs = ["0","0","0","0","0","0","0","0","0","0"]; // Cadena para manejar las observaciones
+window.arrayInv = ["0","0","0","0","0","0","0","0","0","0","0","0"]; // Cadena para manejar el inventario
 
 document.addEventListener('DOMContentLoaded', function() {
     // Verifica si el usuario está autenticado
@@ -53,64 +54,6 @@ const Autocompletar = function() {
 }
 
 // Maneja el envío del formulario usando JavaScript
-document.querySelector('form').addEventListener('submit', async function(e) {
-  e.preventDefault(); // Evita el envío tradicional
-
-  const form = e.target;
-  const formData = new FormData(form);
-
-  // Lista de campos obligatorios (excepto inventario)
-  const requiredFields = [
-    'Marca', 'Modelo', 'Color', 'Kilometraje', 'Placas', 'NumeroDeSerie'
-  ];
-
-  // Verifica si algún campo obligatorio está vacío
-  for (const field of requiredFields) {
-    if (!formData.get(field) || formData.get(field).trim() === '') {
-      alert('Por favor, complete todos los campos obligatorios antes de enviar la solicitud.');
-      return;
-    }
-  }
-
-  const data = Object.fromEntries(formData.entries());
-
-  // Agrega el id_cliente desde localStorage antes de enviar
-  const id_cliente = localStorage.getItem('id_cliente');
-  if (id_cliente) {
-    data.id_cliente = id_cliente;
-  }
-
-  // Agrega la fecha de registro actual
-  data.fecha_registro = new Date().toISOString();
-
-  try {
-    // Envía los datos al backend usando fetch
-    const response = await fetch(form.action, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    form.reset();
-  } catch (error) {
-    console.error('Error al enviar la solicitud:', error);
-    alert('Ocurrió un error al enviar la solicitud. Por favor, inténtelo de nuevo.');
-    return;
-  }
-
-  // 1. Obtén los índices de las imágenes activas
-  //const imagenesSeleccionadas = window.imagenesObservaciones.getActivas();
-  // 2. Si prefieres guardar los nombres de archivo en vez de índices:
-  //const observacionImgs = Array.from(document.querySelectorAll('.list-inline-item img'));
-  //data.imagenes_observaciones = imagenesSeleccionadas.map(idx => {
-  //const img = observacionImgs[idx];
-  //return img ? img.getAttribute('src') : null;
-  //}).filter(Boolean);
-
-  //if (response.ok) {
-  //  alert('¡Solicitud enviada correctamente!, le estaremos contactando pronto!.');
-  // 
-  //}
-});
 
 // Métodos para activar/desactivar imágenes de observaciones
 document.addEventListener('DOMContentLoaded', function() {
@@ -292,6 +235,17 @@ document.addEventListener('DOMContentLoaded', function() {
           console.log("Cadena de observaciones: " + arrayObs);
       }
   });
+
+   // Manejo de checkboxes de inventario
+  for (let i = 1; i <= 12; i++) { // Cambia 10 por la cantidad real de checkboxes
+    const checkbox = document.querySelector(`.inv-checkbox-${i}`);
+    if (checkbox) {
+      checkbox.addEventListener('change', function() {
+        window.arrayInv[i-1] = checkbox.checked ? "1" : "0";
+        console.log("Cadena de inventario:", window.arrayInv);
+      });
+    }
+  }
 });
 
 const CrearCadenaDeObservaciones = function() {
@@ -300,3 +254,107 @@ const CrearCadenaDeObservaciones = function() {
   console.log("Cadena de observaciones creada: " + cadena);
   return cadena;
 }
+
+const CrearCadenaDeInventario = function() {
+  const cadena = arrayInv.join('');
+  console.log("Cadena de inventario creada:", cadena);
+  return cadena;
+}
+
+// Método para enviar la cadena de observaciones al backend
+document.querySelector('form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+document.querySelector('form').addEventListener('submit', async function(e) {
+  e.preventDefault(); // Evita el envío tradicional
+
+  const cadenaInventario = CrearCadenaDeInventario();
+  data.inventario = cadenaInventario;
+  const form = e.target;
+  const formData = new FormData(form);
+
+  // Lista de campos obligatorios (excepto inventario)
+  const requiredFields = [
+    'Marca', 'Modelo', 'Color', 'Kilometraje', 'Placas', 'NumeroDeSerie'
+  ];
+
+  // Verifica si algún campo obligatorio está vacío
+  for (const field of requiredFields) {
+    if (!formData.get(field) || formData.get(field).trim() === '') {
+      alert('Por favor, complete todos los campos obligatorios antes de enviar la solicitud.');
+      return;
+    }
+  }
+
+  const data = Object.fromEntries(formData.entries());
+
+  // Agrega el id_cliente desde localStorage antes de enviar
+  const id_cliente = localStorage.getItem('id_cliente');
+  if (id_cliente) {
+    data.id_cliente = id_cliente;
+  }
+
+  // Agrega la fecha de registro actual
+  data.fecha_registro = new Date().toISOString();
+});
+
+  // Observaciones
+  const cadenaObservaciones = CrearCadenaDeObservaciones();
+  const id_cliente = localStorage.getItem('id_cliente');
+
+  if (!id_cliente) {
+    alert('No se encontró el ID del cliente.');
+    return;
+  }
+
+  try {
+    try {
+    // Envía los datos al backend usando fetch
+    const response = await fetch(form.action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    form.reset();
+  } catch (error) {
+    console.error('Error al enviar la solicitud:', error);
+    alert('Ocurrió un error al enviar la solicitud. Por favor, inténtelo de nuevo.');
+    return;
+  }
+
+    // Luego envía las observaciones
+    const responseObs = await fetch('http://localhost:3000/registrar_observaciones', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_cliente, observaciones: cadenaObservaciones })
+    });
+
+    if (responseObs.ok) {
+      alert('¡Observaciones enviadas correctamente!');
+      window.imagenesObservaciones.desactivarTodas();
+    } else {
+      alert('Error al enviar las observaciones.');
+    }
+  } catch (error) {
+    console.error('Error al enviar las observaciones:', error);
+    alert('Ocurrió un error al enviar las observaciones. Por favor, inténtelo de nuevo.');
+  }
+
+  //luego envia los datos del inventario
+  try {
+    const responseInv = await fetch('http://localhost:3000/registrar_inventario', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_cliente, inventario: CrearCadenaDeInventario() })
+    });
+
+    if (responseInv.ok) {
+      alert('¡Inventario enviado correctamente!');
+    } else {
+      alert('Error al enviar el inventario.');
+    }
+  } catch (error) {
+    console.error('Error al enviar el inventario:', error);
+    alert('Ocurrió un error al enviar el inventario. Por favor, inténtelo de nuevo.');
+  }
+});
