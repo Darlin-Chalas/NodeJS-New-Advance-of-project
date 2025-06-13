@@ -146,6 +146,8 @@ app.post('/registrar_solicitud', async (req, res) => {
   }
 });
 
+
+
 // POST: Recibe y guarda las imagenes de observaciones
 app.post('/registrar_observaciones', async (req, res) => {
   try {
@@ -207,6 +209,22 @@ app.get('/solicitud_servicio', (req, res) => {
     res.json({
     solicitudes 
   })};
+});
+
+//Ruta para obtener el id del vehiculo
+app.get('/vehiculo_id', async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .query('SELECT TOP 1 id_vehiculo FROM Vehiculos ORDER BY id_vehiculo DESC');
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ error: 'Vehículo no encontrado.' });
+    }
+    res.json(result.recordset[0]);
+  } catch (err) {
+    console.error('Error al obtener el id del vehículo:', err);
+    res.status(500).send('Error al obtener el id del vehículo');
+  }
 });
 
 // Rutas para la gestión de usuarios

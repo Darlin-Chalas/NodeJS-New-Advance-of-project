@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
     img.addEventListener('click', () => {
       img.classList.toggle('img-activa');
     });
-  });
+  }); 
 
   // Puedes exportar los métodos si los necesitas en otro lado
   window.imagenesObservaciones = {
