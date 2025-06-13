@@ -114,7 +114,7 @@ app.post('/registrar_solicitud', async (req, res) => {
   try {
     const {
       id_cliente, // este debe venir del frontend
-      Marca, Modelo, Color, Kilometraje, Placas, numero_serie
+      Marca, Modelo, Color, Kilometraje, Placas, NumeroDeSerie
     } = req.body;
 
     const pool = await poolPromise;
@@ -125,14 +125,19 @@ app.post('/registrar_solicitud', async (req, res) => {
       .input('Color', Color)
       .input('Kilometraje', Kilometraje)
       .input('Placas', Placas)
-      .input('NumeroDeSerie', numero_serie)
+      .input('NumeroDeSerie', NumeroDeSerie)
+      .input('Fecha_Registro', sql.DateTime, new Date())
       .query(`
         INSERT INTO Vehiculos (
-          id_cliente, marca, modelo, color, kilometraje, placas, numero_serie, fecha_registro
+          id_cliente, marca, modelo, color, kilometraje, placa, numero_serie, fecha_registro)
           VALUES (
           @id_cliente, @Marca, @Modelo, @Color, @Kilometraje, @Placas, @NumeroDeSerie, @Fecha_Registro
         )
       `);
+
+      //para las imagenes de obervaciones
+      //imagenes_observaciones (el campo de la base de datos)
+      //.input('imagenes_observaciones', sql.VarChar(sql.MAX), JSON.stringify(imagenes_observaciones)) (asi seria en la petición de inserción)
 
     res.json({ message: 'Vehiculo guardado correctamente' });
   } catch (err) {
