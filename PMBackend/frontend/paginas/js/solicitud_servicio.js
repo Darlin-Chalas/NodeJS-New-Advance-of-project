@@ -359,5 +359,21 @@ document.querySelector('form').addEventListener('submit', async function(e) {
     alert('Ocurrió un error al enviar el inventario. Por favor, inténtelo de nuevo.');
   }
 
-  
+  setTimeout(() => { 
+    fetch('http://localhost:3000/vehiculo_id')
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.id_vehiculo) {
+          localStorage.setItem('id_vehiculo', data.id_vehiculo);
+          //window.location.href = '/PMBackend/frontend/paginas/solicitud_servicio.html'; // Redirige a la página de solicitud de servicio
+        } else {
+          console.error('No se pudo obtener el ID del vehículo.');
+          alert('Error al obtener el ID del vehículo. Por favor, inténtelo de nuevo más tarde.');
+        }
+      })
+      .catch(error => {
+        console.error('Error al hacer la petición al backend:', error);
+        alert('Ocurrió un error al procesar su solicitud. Por favor, inténtelo de nuevo más tarde.');
+      });
+  }, 10000); 
 });
