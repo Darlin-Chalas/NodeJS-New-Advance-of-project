@@ -13,6 +13,11 @@ create table Clientes(
     correo varchar(100)
 )
 
+insert into Clientes values ('O','Ufufuefuefue','Ñagisfuefuefue','123156789314','8091719200','nomevallaamalinterpretaveldamisufufuefuefuegaginsfuefuefueufuebimbinosas@gmail.com')
+
+--transferir a "mi cuenta" from usuario.cedula "11178314" dinero.cantidad(1000000000000).rapidamente
+select * from Clientes;
+
 create table Usuarios(
     id_usuario int IDENTITY(1,1),
     id_cliente int not null,
@@ -68,15 +73,45 @@ create table Vehiculos(
     fecha_registro datetime
 )
 
+--Seccion para hacer las modificaciones de la tabla Vehiculos
+
+alter table Vehiculos
+add 
+
+go
+
+--Fin de la seccion de modificaciones de la tabla Vehiculos
+
 --Seccion de registros
 
 create table OrdenesDeServicio(
-    id_orden_servicio int IDENTITY(1,1),
-    id_vehiculo int, --llave foranea
-    id_cliente int,
+    id_orden_servicio int IDENTITY(1,1), 
+    id_vehiculo int, --llave foranea (recibido)
+    id_cliente int, --llave foranea (recibido)
     fecha_ingreso datetime,
-    fecha_salida datetime
+    fecha_salida datetime,
+    Ingreso_grua varchar(10),  --llevarlo a la tabla "vehiculos"
+    observaciones varchar(10), --(recibido)
+    inventario varchar(12) --(recibido)
 )
+
+--Seccion para hacer las modificaciones de la tabla ordenes de servicio
+
+alter table OrdenesDeServicio
+drop column id_cliente;
+
+alter table OrdenesDeServicio
+drop column fecha_ingreso;
+
+alter table OrdenesDeServicio
+drop column fecha_salida;
+
+alter table OrdenesDeServicio
+drop column Ingreso_grua;
+
+
+
+--Fin de la seccion de modificaciones de la tabla ordenes de servicio
 
 --Linea divisora------------------------------
 
