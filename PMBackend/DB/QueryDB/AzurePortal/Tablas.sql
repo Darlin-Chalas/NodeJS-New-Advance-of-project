@@ -73,11 +73,14 @@ create table Vehiculos(
 --Seccion de registros
 
 create table OrdenesDeServicio(
-    id_orden_servicio int IDENTITY(1,1),
-    id_vehiculo int, --llave foranea
-    id_cliente int,
+    id_orden_servicio int IDENTITY(1,1), 
+    id_vehiculo int, --llave foranea (recibido)
+    id_cliente int, --llave foranea (recibido)
     fecha_ingreso datetime,
-    fecha_salida datetime
+    fecha_salida datetime,
+    Ingreso_grua varchar(10),  --llevarlo a la tabla "vehiculos"
+    observaciones varchar(10), --(recibido)
+    inventario varchar(12) --(recibido)
 )
 
 ALTER Table OrdenesDeServicio
