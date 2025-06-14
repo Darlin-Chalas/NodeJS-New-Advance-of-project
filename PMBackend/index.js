@@ -1,35 +1,32 @@
-// 1. Importar express
+// =======================
+// 1. IMPORTACIONES Y CONFIGURACIÓN INICIAL
+// =======================
 const express = require('express');
 const cors = require('cors');
-const { sql, poolPromise } = require('./Config/DB'); // Usa tu módulo de conexión
-const { VarChar } = require('mssql');
+const { sql, poolPromise } = require('./Config/DB');
 require('dotenv').config();
 
 const app = express();
-app.use(cors()); // 🔓 Habilita CORS para cualquier origen
-
-// 2. Middleware para leer JSON
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 3. Ruta de prueba
-//app.get('/usuarios', (req, res) => {
-//  res.json([
-//    { contraseña: 1234, usuario: 'Angel' },
-//    { contraseña: 2468, usuario: 'Darlin' }
-//  ]);
-//});
-
-// 4. Iniciar servidor
+// =======================
+// 2. INICIAR SERVIDOR
+// =======================
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
 
-// 5. Conexión a la base de datos (opcional, si se necesita)
+// =======================
+// 3. RUTAS DE CONSULTA (GET)
+// =======================
+
+// Usuarios
 app.get('/usuarios', async (req, res) => {
   try {
-    const pool = await poolPromise; // Usa la conexión centralizada
+    const pool = await poolPromise;
     const result = await pool.request().query('SELECT correo, contraseña FROM Usuarios');
     res.json(result.recordset);
   } catch (err) {
@@ -38,15 +35,11 @@ app.get('/usuarios', async (req, res) => {
   }
 });
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////La ruta del diablo no funciona coño
-//La ruta de lo cliente coñaso no funciona diablo coñaaaso
-
-app.get('/clientes', async(req, res) => {
+// Clientes
+app.get('/clientes', async (req, res) => {
   try {
-    const pool = await poolPromise; // Usa la conexión centralizada
+    const pool = await poolPromise;
     const result = await pool.request().query('SELECT id_cliente, correo, nombre, telefono FROM Clientes');
-    //console.log('Datos de clientes:', result.recordset); // Para depuración
     res.json(result.recordset);
   } catch (err) {
     console.error('Error al conectar con Azure SQL:', err);
@@ -54,18 +47,17 @@ app.get('/clientes', async(req, res) => {
   }
 });
 
+// Obtener nombre de cliente por correo
 app.get('/cliente_nombre', async (req, res) => {
   try {
-    const { correo } = req.query; // Obtiene el ID del cliente desde la query string
-    const pool = await poolPromise; // Usa la conexión centralizada
+    const { correo } = req.query;
+    const pool = await poolPromise;
     const result = await pool.request()
       .input('correo', sql.VarChar(100), correo)
       .query('SELECT nombre FROM Clientes WHERE correo = @correo');
-    
     if (result.recordset.length === 0) {
       return res.status(404).json({ error: 'Cliente no encontrado.' });
     }
-    
     res.json(result.recordset[0]);
   } catch (err) {
     console.error('Error al obtener cliente por correo:', err);
@@ -73,7 +65,7 @@ app.get('/cliente_nombre', async (req, res) => {
   }
 });
 
-
+// Políticas, términos y contacto
 app.get('/politicas_privacidad', (req, res) => {
   res.json({
     page: 'politicas_privacidad',
@@ -98,22 +90,41 @@ app.get('/formulario_contacto', (req, res) => {
   });
 });
 
-//app.get('/solicitud_servicio', (req, res) => {
-//  res.json({
-//    page: 'solicitud_servicio',
-//    title: 'Solicitud de Servicio',
-//    content: 'Aquí puedes realizar tu solicitud de servicio para Papasito\'s Mechanics.'
-//  });
-//});
-
-// Array temporal para almacenar solicitudes (solo mientras el servidor está encendido)
+// Obtener todas las solicitudes (temporal)
 const solicitudes = [];
+app.get('/solicitud_servicio', (req, res) => {
+  if (solicitudes.length === 0) {
+    res.json({ message: 'No hay solicitudes disponibles.' });
+  } else {
+    res.json({ solicitudes });
+  }
+});
 
-// POST: Recibe y guarda la solicitud de servicio
+// Obtener el último id_vehiculo
+app.get('/vehiculo_id', async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .query('SELECT TOP 1 id_vehiculo FROM Vehiculos ORDER BY id_vehiculo DESC');
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ error: 'Vehículo no encontrado.' });
+    }
+    res.json(result.recordset[0]);
+  } catch (err) {
+    console.error('Error al obtener el id del vehículo:', err);
+    res.status(500).send('Error al obtener el id del vehículo');
+  }
+});
+
+// =======================
+// 4. RUTAS DE REGISTRO (POST)
+// =======================
+
+// Registrar solicitud de servicio (vehículo)
 app.post('/registrar_solicitud', async (req, res) => {
   try {
     const {
-      id_cliente, // este debe venir del frontend
+      id_cliente,
       Marca, Modelo, Color, Kilometraje, Placas, NumeroDeSerie
     } = req.body;
 
@@ -135,10 +146,6 @@ app.post('/registrar_solicitud', async (req, res) => {
         )
       `);
 
-      //para las imagenes de obervaciones
-      //imagenes_observaciones (el campo de la base de datos)
-      //.input('imagenes_observaciones', sql.VarChar(sql.MAX), JSON.stringify(imagenes_observaciones)) (asi seria en la petición de inserción)
-
     res.json({ message: 'Vehiculo guardado correctamente' });
   } catch (err) {
     console.error('Error al guardar el vehiculo:', err);
@@ -146,17 +153,14 @@ app.post('/registrar_solicitud', async (req, res) => {
   }
 });
 
-
-
-// POST: Recibe y guarda las imagenes de observaciones
+// Registrar observaciones OJOOOO En esta parte tenemos que trabajar que el codigo envie
+// todos los datos a la tabla OrdenesDeServicio, no podemos enviar solo las observaciones
 app.post('/registrar_observaciones', async (req, res) => {
   try {
     const { id_cliente, observaciones } = req.body;
-
     if (!id_cliente || !observaciones) {
       return res.status(400).json({ error: 'Datos inválidos.' });
     }
-
     const pool = await poolPromise;
     await pool.request()
       .input('id_cliente', sql.Int, id_cliente)
@@ -173,19 +177,17 @@ app.post('/registrar_observaciones', async (req, res) => {
   }
 });
 
-//POST: Recibe y guarda los checkboxes de inventario
+// Registrar inventario OJJOOO Esta parte es un segmento del post que esta arriba
 app.post('/registrar_inventario', async (req, res) => {
   try {
     const { id_cliente, inventario } = req.body;
-
     if (!id_cliente || !inventario) {
       return res.status(400).json({ error: 'Datos inválidos.' });
     }
-
     const pool = await poolPromise;
     await pool.request()
       .input('id_cliente', sql.Int, id_cliente)
-      .input('inventario', sql.VarChar(50), req.body.inventario)
+      .input('inventario', sql.VarChar(50), inventario)
       .query(`
         INSERT INTO OrdenesDeServicio (id_cliente, inventario)
         VALUES (@id_cliente, @inventario)
@@ -198,51 +200,12 @@ app.post('/registrar_inventario', async (req, res) => {
   }
 });
 
-// GET: Devuelve todas las solicitudes recibidas
-app.get('/solicitud_servicio', (req, res) => {
-  
-  if (solicitudes.length === 0) {
-    res.json({
-        message: 'No hay solicitudes disponibles.'
-      });
-  } else {
-    res.json({
-    solicitudes 
-  })};
-});
-
-//Ruta para obtener el id del vehiculo
-app.get('/vehiculo_id', async (req, res) => {
-  try {
-    const pool = await poolPromise;
-    const result = await pool.request()
-      .query('SELECT TOP 1 id_vehiculo FROM Vehiculos ORDER BY id_vehiculo DESC');
-    if (result.recordset.length === 0) {
-      return res.status(404).json({ error: 'Vehículo no encontrado.' });
-    }
-    res.json(result.recordset[0]);
-  } catch (err) {
-    console.error('Error al obtener el id del vehículo:', err);
-    res.status(500).send('Error al obtener el id del vehículo');
-  }
-});
-
-// Rutas para la gestión de usuarios
+// =======================
+// 5. RUTAS DE USUARIOS (API)
+// =======================
 const router = express.Router();
 
-// Ruta para obtener todos los clientes
-//router.get('/clientes', async (req, res) => {
-//  try {
-//    const pool = await poolPromise;
-//    const result = await pool.request().query('SELECT id_cliente, correo FROM Clientes');
-//    res.json(result.recordset);
-//  } catch (err) {
-//    console.error('Error al obtener clientes:', err);
-//    res.status(500).json({ error: 'Error al obtener clientes.' });
-//  }
-//});
-
-// Ruta para registrar usuario
+// Registrar usuario
 router.post('/registrar_usuario', async (req, res) => {
   try {
     console.log('Datos recibidos en el backend:', req.body);
