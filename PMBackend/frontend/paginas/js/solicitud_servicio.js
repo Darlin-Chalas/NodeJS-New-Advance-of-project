@@ -140,6 +140,9 @@ document.addEventListener('DOMContentLoaded', function () {
 document.querySelector('form').addEventListener('submit', async function (e) {
     e.preventDefault();
 
+    alert('Enviando solicitud, por favor espere...');
+    
+    // Obtener datos del formulario
     const form = e.target;
     const formData = new FormData(form);
 
@@ -161,66 +164,15 @@ document.querySelector('form').addEventListener('submit', async function (e) {
     data.id_cliente = id_cliente;
     data.fecha_registro = new Date().toISOString();
     data.inventario = CrearCadenaDeInventario();
+    data.observaciones = CrearCadenaDeObservaciones();
 
-    // Enviar datos del formulario principal
-    try {
-        const response = await fetch(form.action, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        form.reset();
-    } catch (error) {
-        console.error('Error al enviar la solicitud:', error);
-        alert('Ocurrió un error al enviar la solicitud. Por favor, inténtelo de nuevo.');
-        return;
-    }
-
-    // Enviar observaciones
-    try {
-        const cadenaObservaciones = CrearCadenaDeObservaciones();
-        const responseObs = await fetch('http://localhost:3000/registrar_observaciones', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_cliente, observaciones: cadenaObservaciones })
-        });
-
-        if (responseObs.ok) {
-            alert('¡Observaciones enviadas correctamente!');
-            window.imagenesObservaciones.desactivarTodas();
-        } else {
-            alert('Error al enviar las observaciones.');
-        }
-    } catch (error) {
-        console.error('Error al enviar las observaciones:', error);
-        alert('Ocurrió un error al enviar las observaciones. Por favor, inténtelo de nuevo.');
-    }
-
-    // Enviar inventario
-    try {
-        const responseInv = await fetch('http://localhost:3000/registrar_inventario', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_cliente, inventario: CrearCadenaDeInventario() })
-        });
-
-        if (responseInv.ok) {
-            alert('¡Inventario enviado correctamente!');
-        } else {
-            alert('Error al enviar el inventario.');
-        }
-    } catch (error) {
-        console.error('Error al enviar el inventario:', error);
-        alert('Ocurrió un error al enviar el inventario. Por favor, inténtelo de nuevo.');
-    }
-
-    // Obtener id_vehiculo después de 10 segundos
     setTimeout(() => {
         fetch('http://localhost:3000/vehiculo_id')
             .then(response => response.json())
             .then(data => {
                 if (data && data.id_vehiculo) {
-                    localStorage.setItem('id_vehiculo', data.id_vehiculo);
+                    const idVehiculoNum = Number(data.id_vehiculo) + 1;
+                    localStorage.setItem('id_vehiculo', idVehiculoNum.toString());
                     // window.location.href = '/PMBackend/frontend/paginas/solicitud_servicio.html';
                 } else {
                     console.error('No se pudo obtener el ID del vehículo.');
@@ -231,5 +183,29 @@ document.querySelector('form').addEventListener('submit', async function (e) {
                 console.error('Error al hacer la petición al backend:', error);
                 alert('Ocurrió un error al procesar su solicitud. Por favor, inténtelo de nuevo más tarde.');
             });
+    }, 5000);  
+
+    // Enviar datos del formulario principal después de 10 segundos
+    setTimeout(async () => {
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (response.ok) {
+                alert('¡Solicitud enviada correctamente!, le estaremos contactando pronto!.');
+                form.reset();
+                window.imagenesObservaciones.desactivarTodas();
+            } else {
+                alert('Ocurrió un error al enviar la solicitud. Por favor, inténtelo de nuevo.');
+            }
+        } catch (error) {
+            console.error('Error al enviar la solicitud:', error);
+            alert('Ocurrió un error al enviar la solicitud. Por favor, inténtelo de nuevo.');
+            return;
+        }
     }, 10000);
+
+    // Obtener id_vehiculo después de 10 segundos
 });

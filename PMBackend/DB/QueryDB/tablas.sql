@@ -30,6 +30,12 @@ create table Usuarios(
     contraseña varchar(100) not null
 )
 
+select * from Usuarios; 
+
+alter table Usuarios
+set tipo_usuario = '0'
+where id_usuario = 1;
+
 --Modificacion de la tabla Usuarios para poder designar si es Cliente o Mecánico
 alter table Usuarios 
 add tipo_usuario varchar(1);
@@ -81,6 +87,8 @@ create table Vehiculos(
 
 --Seccion para hacer las modificaciones de la tabla Vehiculos
 
+select * from vehiculos
+
 alter table Vehiculos
 add 
 
@@ -93,13 +101,12 @@ go
 create table OrdenesDeServicio(
     id_orden_servicio int IDENTITY(1,1), 
     id_vehiculo int, --llave foranea (recibido)
-    id_cliente int, --llave foranea (recibido)
-    fecha_ingreso datetime,
-    fecha_salida datetime,
-    Ingreso_grua varchar(10),  --llevarlo a la tabla "vehiculos"
+    ingreso_grua varchar(10),  --llevarlo a la tabla "vehiculos"
     observaciones varchar(10), --(recibido)
     inventario varchar(12) --(recibido)
 )
+
+select * from OrdenesDeServicio;
 
 --Seccion para hacer las modificaciones de la tabla ordenes de servicio
 

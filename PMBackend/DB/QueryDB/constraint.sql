@@ -110,6 +110,9 @@ check (id_vehiculo is not null);
 --constraint DF_OrdenesDeServicio_defaults
 --default getdate() for fecha;
 go
+
+alter table OrdenesDeServicio
+drop constraint FK_OrdenesDeServicio_id_cliente
 --Restricciones de la tabla de Hojas de parte
 
 alter table HojasDeParte

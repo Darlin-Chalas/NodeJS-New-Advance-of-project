@@ -27,7 +27,7 @@ app.listen(PORT, () => {
 app.get('/usuarios', async (req, res) => {
   try {
     const pool = await poolPromise;
-    const result = await pool.request().query('SELECT correo, contraseña FROM Usuarios');
+    const result = await pool.request().query('SELECT correo, contraseña, tipo_usuario FROM Usuarios');
     res.json(result.recordset);
   } catch (err) {
     console.error('Error al conectar con Azure SQL:', err);
@@ -125,78 +125,59 @@ app.post('/registrar_solicitud', async (req, res) => {
   try {
     const {
       id_cliente,
-      Marca, Modelo, Color, Kilometraje, Placas, NumeroDeSerie
+      Marca, Modelo, Color, Kilometraje, Placas, NumeroDeSerie,
+      observaciones,
+      inventario
     } = req.body;
 
     const pool = await poolPromise;
-    await pool.request()
-      .input('id_cliente', id_cliente)
-      .input('Marca', Marca)
-      .input('Modelo', Modelo)
-      .input('Color', Color)
-      .input('Kilometraje', Kilometraje)
-      .input('Placas', Placas)
-      .input('NumeroDeSerie', NumeroDeSerie)
-      .input('Fecha_Registro', sql.DateTime, new Date())
-      .query(`
-        INSERT INTO Vehiculos (
-          id_cliente, marca, modelo, color, kilometraje, placa, numero_serie, fecha_registro)
+
+    // 1. Insertar vehículo si se proporcionan los datos
+    let id_vehiculo = null;
+    if (Marca && Modelo && Color && Kilometraje && Placas && NumeroDeSerie) {
+      const vehiculoResult = await pool.request()
+        .input('id_cliente', sql.Int, id_cliente)
+        .input('Marca', sql.VarChar(50), Marca)
+        .input('Modelo', sql.VarChar(50), Modelo)
+        .input('Color', sql.VarChar(50), Color)
+        .input('Kilometraje', sql.Int, Kilometraje)
+        .input('Placas', sql.VarChar(20), Placas)
+        .input('NumeroDeSerie', sql.VarChar(50), NumeroDeSerie)
+        .input('Fecha_Registro', sql.DateTime, new Date())
+        .query(`
+          INSERT INTO Vehiculos (
+            id_cliente, marca, modelo, color, kilometraje, placa, numero_serie, fecha_registro)
+          OUTPUT INSERTED.id_vehiculo
           VALUES (
-          @id_cliente, @Marca, @Modelo, @Color, @Kilometraje, @Placas, @NumeroDeSerie, @Fecha_Registro
-        )
-      `);
-
-    res.json({ message: 'Vehiculo guardado correctamente' });
-  } catch (err) {
-    console.error('Error al guardar el vehiculo:', err);
-    res.status(500).send('Error al guardar vehiculo');
-  }
-});
-
-// Registrar observaciones OJOOOO En esta parte tenemos que trabajar que el codigo envie
-// todos los datos a la tabla OrdenesDeServicio, no podemos enviar solo las observaciones
-app.post('/registrar_observaciones', async (req, res) => {
-  try {
-    const { id_cliente, observaciones } = req.body;
-    if (!id_cliente || !observaciones) {
-      return res.status(400).json({ error: 'Datos inválidos.' });
+            @id_cliente, @Marca, @Modelo, @Color, @Kilometraje, @Placas, @NumeroDeSerie, @Fecha_Registro
+          )
+        `);
+      id_vehiculo = vehiculoResult.recordset[0].id_vehiculo;
     }
-    const pool = await poolPromise;
-    await pool.request()
-      .input('id_cliente', sql.Int, id_cliente)
-      .input('observaciones', sql.VarChar(sql.MAX), observaciones)
-      .query(`
-        INSERT INTO OrdenesDeServicio (id_cliente, observaciones)
-        VALUES (@id_cliente, @observaciones)
-      `);
 
-    res.json({ message: 'Observaciones guardadas correctamente.' });
-  } catch (err) {
-    console.error('Error al guardar las observaciones:', err);
-    res.status(500).send('Error al guardar las observaciones');
-  }
-});
-
-// Registrar inventario OJJOOO Esta parte es un segmento del post que esta arriba
-app.post('/registrar_inventario', async (req, res) => {
-  try {
-    const { id_cliente, inventario } = req.body;
-    if (!id_cliente || !inventario) {
-      return res.status(400).json({ error: 'Datos inválidos.' });
+    // 2. Insertar orden de servicio si hay observaciones o inventario, después de 20 segundos
+    if (observaciones || inventario) {
+      setTimeout(async () => {
+        try {
+          await pool.request()
+            .input('id_cliente', sql.Int, id_cliente)
+            .input('id_vehiculo', id_vehiculo)
+            .input('observaciones', sql.VarChar(sql.MAX), observaciones || null)
+            .input('inventario', sql.VarChar(50), inventario || null)
+            .query(`
+              INSERT INTO OrdenesDeServicio (id_vehiculo, observaciones, inventario)
+              VALUES (@id_vehiculo, @observaciones, @inventario) --hay que poner el ingreso grua
+            `);
+        } catch (err) {
+          console.error('Error al insertar orden de servicio después del timeout:', err);
+        }
+      }, 5000); // 10 segundos
     }
-    const pool = await poolPromise;
-    await pool.request()
-      .input('id_cliente', sql.Int, id_cliente)
-      .input('inventario', sql.VarChar(50), inventario)
-      .query(`
-        INSERT INTO OrdenesDeServicio (id_cliente, inventario)
-        VALUES (@id_cliente, @inventario)
-      `);
 
-    res.json({ message: 'Inventario guardado correctamente.' });
+    res.json({ message: 'Solicitud registrada correctamente.' });
   } catch (err) {
-    console.error('Error al guardar el inventario:', err);
-    res.status(500).send('Error al guardar el inventario');
+    console.error('Error al registrar la solicitud:', err);
+    res.status(500).send('Error al registrar la solicitud');
   }
 });
 

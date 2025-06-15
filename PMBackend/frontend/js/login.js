@@ -95,15 +95,16 @@ document.addEventListener('DOMContentLoaded', function() {
   if (btnGoIndex && localStorage.getItem('isLoggedIn') === 'true') {
     btnGoIndex.addEventListener('click', function(e) {
       e.preventDefault();
-      // Redirige al index
-      if (usuario.tipo_usuario === '0') {
+      // Busca el usuario logueado usando el correo almacenado
+      const correo = localStorage.getItem('correo_cliente') || window.emailIngresado;
+      const usuario = usuarios.find(u => u.correo === correo);
+      if (usuario && usuario.tipo_usuario == '0') {
         window.location.href = "/PMBackend/frontend/paginas/pagina_principal.html";
-      } 
-      //else {
-      //  window.location.href = "/PMBackend/frontend/paginas/pagina_principal_admin.html";
-      //}
-    }
-  )};
+      } else {
+        window.location.href = "/PMBackend/frontend/paginas/pagina_principal_admin.html";
+      }
+    });
+  }
 
   // REGISTRO DE USUARIO
   const btnSignUp = document.querySelector('.btn-signup');
@@ -150,11 +151,9 @@ document.addEventListener('DOMContentLoaded', function() {
           const data = await response.json();
           if (response.ok) {
             alert('¡Usuario registrado correctamente!');
-            form.reset();            // Opcional: muestra la animación de éxito
-            const successDiv = document.querySelector('.success');
-            if (successDiv) successDiv.style.display = 'block';
+            window.location.reload(); // Recarga la página
           } else {
-            alert(data.error || 'Error al registrar usuario.');
+            alert('Error al registrar usuario');
           }
         } catch (error) {
           alert('Error de conexión con el servidor.');
