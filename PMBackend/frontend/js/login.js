@@ -96,7 +96,12 @@ document.addEventListener('DOMContentLoaded', function() {
     btnGoIndex.addEventListener('click', function(e) {
       e.preventDefault();
       // Redirige al index
-      window.location.href = "/PMBackend/frontend/paginas/pagina_principal.html";
+      if (usuario.tipo_usuario === '0') {
+        window.location.href = "/PMBackend/frontend/paginas/pagina_principal.html";
+      } 
+      //else {
+      //  window.location.href = "/PMBackend/frontend/paginas/pagina_principal_admin.html";
+      //}
     }
   )};
 

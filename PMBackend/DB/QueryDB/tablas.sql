@@ -13,10 +13,15 @@ create table Clientes(
     correo varchar(100)
 )
 
-insert into Clientes values ('O','Ufufuefuefue','Ñagisfuefuefue','123156789314','8091719200','nomevallaamalinterpretaveldamisufufuefuefuegaginsfuefuefueufuebimbinosas@gmail.com')
+select * from Clientes;
+insert into Clientes values ('Angel','Abreu','Rosario','22300346792','8298837747','ing.angelrinformatica@gmail.com')
+delete from Clientes where id_cliente = 11;
+
+delete from Usuarios where id_usuario = 20;
 
 --transferir a "mi cuenta" from usuario.cedula "11178314" dinero.cantidad(1000000000000).rapidamente
-select * from Clientes;
+
+select * from Usuarios  
 
 create table Usuarios(
     id_usuario int IDENTITY(1,1),
@@ -25,10 +30,11 @@ create table Usuarios(
     contraseña varchar(100) not null
 )
 
-SELECT * from Usuarios;
+--Modificacion de la tabla Usuarios para poder designar si es Cliente o Mecánico
+alter table Usuarios 
+add tipo_usuario varchar(1);
 
-ALTER TABLE Usuarios
-add nombre varchar(20) not null;
+SELECT * from Usuarios;
 
 
 create table Empleados(
@@ -106,11 +112,6 @@ drop column fecha_ingreso;
 alter table OrdenesDeServicio
 drop column fecha_salida;
 
-alter table OrdenesDeServicio
-drop column Ingreso_grua;
-
-
-
 --Fin de la seccion de modificaciones de la tabla ordenes de servicio
 
 --Linea divisora------------------------------
@@ -133,6 +134,12 @@ create table HojasDeParte(
     precio_piezas_total money,
     precio_final_total money
 )
+
+--Seccion para hacer llas modificaciones de la tabla HojasDeParte
+
+
+
+--Fin de la seccion de modificaciones de la tabla HojasDeParte
 
 create table RepuestosStock(
     id_repuesto_stock int IDENTITY(1,1),
